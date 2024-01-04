@@ -14,6 +14,13 @@ pub fn run(args: Vec<String>) -> Result<()> {
 mod tests {
     use super::*;
 
+    fn take_error(result: Result<()>) {
+        match result {
+            Err(_) => {}
+            _ => panic!(),
+        }
+    }
+
     #[test]
     fn run_returns() {
         let _ = run(vec![]);
@@ -21,10 +28,7 @@ mod tests {
 
     #[test]
     fn run_no_args_returns_err() {
-        match run(vec![]) {
-            Err(_) => {}
-            _ => panic!(),
-        }
+        take_error(run(vec![]));
     }
 
     #[test]
@@ -37,9 +41,6 @@ mod tests {
 
     #[test]
     fn run_gibberish_returns_err() {
-        match run(vec!["gibberish".to_string()]) {
-            Err(_) => {}
-            _ => panic!(),
-        }
+        take_error(run(vec!["gibberish".to_string()]));
     }
 }
