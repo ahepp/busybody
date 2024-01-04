@@ -1,6 +1,6 @@
 use crate::yes;
 
-type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
+pub type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
 enum Cmd {
     Yes,
@@ -10,7 +10,6 @@ pub fn run(args: Vec<String>) -> Result<()> {
     match parse(args.first())? {
         Cmd::Yes => yes::yes(),
     }
-    Ok(())
 }
 
 fn parse(maybe: Option<&String>) -> Result<Cmd> {
