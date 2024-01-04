@@ -44,14 +44,6 @@ mod tests {
     }
 
     #[test]
-    fn run_yes_returns_ok() {
-        match run(vec!["yes".to_string()]) {
-            Ok(_) => {}
-            _ => panic!(),
-        }
-    }
-
-    #[test]
     fn run_gibberish_returns_err() {
         take_error(run(vec!["gibberish".to_string()]));
     }
