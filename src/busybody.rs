@@ -1,13 +1,18 @@
 type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
-pub fn run(args: Vec<String>) -> Result<()> {
-    parse(args.first())
+enum Cmd {
+    Yes,
 }
 
-fn parse(maybe: Option<&String>) -> Result<()> {
+pub fn run(args: Vec<String>) -> Result<()> {
+    parse(args.first())?;
+    Ok(())
+}
+
+fn parse(maybe: Option<&String>) -> Result<Cmd> {
     match maybe {
         Some(name) => match name.as_str() {
-            "yes" => Ok(()),
+            "yes" => Ok(Cmd::Yes),
             _ => Err("failed to parse name".into()),
         },
         None => Err("called with no name".into()),
@@ -46,5 +51,13 @@ mod tests {
     #[test]
     fn run_gibberish_returns_err() {
         take_error(run(vec!["gibberish".to_string()]));
+    }
+
+    #[test]
+    fn parse_yes_returns_yes_cmd() {
+        match parse(Some(&"yes".to_string())) {
+            Ok(Cmd::Yes) => {}
+            _ => panic!(),
+        }
     }
 }
