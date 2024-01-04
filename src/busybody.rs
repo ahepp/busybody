@@ -1,7 +1,11 @@
 type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
 pub fn run(args: Vec<String>) -> Result<()> {
-    match args.first() {
+    parse(args.first())
+}
+
+fn parse(maybe: Option<&String>) -> Result<()> {
+    match maybe {
         Some(name) => match name.as_str() {
             "yes" => Ok(()),
             _ => Err("failed to parse name".into()),
