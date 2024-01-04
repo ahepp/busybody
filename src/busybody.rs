@@ -1,15 +1,14 @@
-use crate::yes;
-
 pub type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
-enum Cmd {
+pub enum Cmd {
     Yes,
 }
 
-pub fn run(args: Vec<String>) -> Result<()> {
-    match parse(args.first())? {
-        Cmd::Yes => yes::yes(),
-    }
+pub fn run(
+    args: Vec<String>,
+    dispatch: impl Fn(Cmd) -> Result<()>,
+) -> Result<()> {
+    dispatch(parse(args.first())?)
 }
 
 fn parse(maybe: Option<&String>) -> Result<Cmd> {
@@ -33,19 +32,23 @@ mod tests {
         }
     }
 
+    fn null_dispatch(_: Cmd) -> Result<()> {
+        Err("null dispatch".into())
+    }
+
     #[test]
     fn run_returns() {
-        let _ = run(vec![]);
+        let _ = run(vec![], null_dispatch);
     }
 
     #[test]
     fn run_no_args_returns_err() {
-        take_error(run(vec![]));
+        take_error(run(vec![], null_dispatch));
     }
 
     #[test]
     fn run_gibberish_returns_err() {
-        take_error(run(vec!["gibberish".to_string()]));
+        take_error(run(vec!["gibberish".to_string()], null_dispatch));
     }
 
     #[test]
@@ -54,5 +57,13 @@ mod tests {
             Ok(Cmd::Yes) => {}
             _ => panic!(),
         }
+    }
+
+    #[test]
+    fn run_yes_triggers_dispatch() {
+        let dispatch = |cmd: Cmd| match cmd {
+            Cmd::Yes => Ok(()),
+        };
+        run(vec!["yes".to_string()], dispatch).unwrap();
     }
 }
