@@ -1,3 +1,5 @@
+use crate::yes;
+
 type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
 enum Cmd {
@@ -5,7 +7,9 @@ enum Cmd {
 }
 
 pub fn run(args: Vec<String>) -> Result<()> {
-    parse(args.first())?;
+    match parse(args.first())? {
+        Cmd::Yes => yes::yes(),
+    }
     Ok(())
 }
 
