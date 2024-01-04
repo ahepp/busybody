@@ -1,3 +1,5 @@
+use std::path::Path;
+
 pub type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
 pub enum Cmd {
@@ -13,11 +15,17 @@ pub fn run(
 
 fn parse(maybe: Option<&String>) -> Result<Cmd> {
     match maybe {
-        Some(name) => match name.as_str() {
-            "yes" => Ok(Cmd::Yes),
-            _ => Err("failed to parse name".into()),
-        },
         None => Err("called with no name".into()),
+        Some(name) => match Path::new(name).file_name() {
+            None => Err("path has no filename".into()),
+            Some(path) => match path.to_str() {
+                None => Err("filename cannot be expressed as str".into()),
+                Some(string) => match string {
+                    "yes" => Ok(Cmd::Yes),
+                    _ => Err("failed to parse name".into()),
+                },
+            },
+        },
     }
 }
 
@@ -65,5 +73,13 @@ mod tests {
             Cmd::Yes => Ok(()),
         };
         run(vec!["yes".to_string()], dispatch).unwrap();
+    }
+
+    #[test]
+    fn parse_yes_with_leading_path_returns_yes_cmd() {
+        match parse(Some(&"/all/kinds/.././of/stuff/yes".to_string())) {
+            Ok(Cmd::Yes) => {}
+            _ => panic!(),
+        }
     }
 }
